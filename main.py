@@ -5,23 +5,29 @@ import numpy as np
 from stl import mesh
 
 def make_mesh(greyscale):
-    vertices = np.array()
+    vertices = np.array([])
     width, height = greyscale.size
     for y in range(height):
         for x in range(width):
             depth = img.getpixel((x, y))
             np.append(vertices, [x, y, depth])
 
-    faces = np.array()
-    for y in range(1, height-1):
-        for x in range(width):
-            np.append(faces, [])
+    faces = np.array([])
+    for y in range(1, height):
+        i = y*width
+        np.append(faces, [i, i+1-width, i-width])
+        for x in range(1, width-1):
+            i = y*width+x
+            np.append(faces, [i, i-1, i-width])
+            np.append(faces, [i, i+1-width, i-width])
+        i = y*width+width-1
+        np.append(faces, [i, i-1, i-width])
 
     cube_mesh = mesh.Mesh(np.zeros(faces.shape[0], dtype=mesh.Mesh.dtype))
     for i, f in enumerate(faces):
         for j in range(3):
             cube_mesh.vectors[i][j] = vertices[f[j], :]
-    
+    return cube_mesh
 
 #file_path = input("File path of image: ")
 #region for testing:
